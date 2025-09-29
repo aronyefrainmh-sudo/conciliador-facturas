@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Conciliador (XML / PDF / CSV) - Facturas vs Estado de Cuenta</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Conciliador de Facturas</h1>
+    <p>Sube facturas y estado de cuenta en <strong>XML, PDF o CSV</strong>. El sistema empareja por <em>número/UUID</em>, <em>monto</em> y <em>fecha</em>.</p>
+  </header>
+
+  <main>
+    <section class="upload">
+      <div class="file-group">
+        <label>Facturas (XML/PDF/CSV)</label>
+        <input id="invoicesFiles" type="file" multiple accept=".xml,.pdf,.csv" />
+        <small>CFDI XML (3.3/4.0), PDFs de factura o CSV con: invoiceNumber,date,amount,client</small>
+      </div>
+
+      <div class="file-group">
+        <label>Estado de cuenta (PDF/CSV/XML)</label>
+        <input id="statementFiles" type="file" multiple accept=".pdf,.csv,.xml" />
+        <small>PDF del banco o CSV con: reference,date,amount,description. (XML si lo emite el banco)</small>
+      </div>
+
+      <div class="controls">
+        <button id="parseBtn" class="primary">Procesar y Conciliar</button>
+        <button id="exportBtn" class="secondary" disabled>Exportar no conciliadas (CSV)</button>
+      </div>
+    </section>
+
+    <section class="options">
+      <label>Mostrar: 
+        <select id="filterSelect">
+          <option value="all">Todas</option>
+          <option value="matched">Conciliadas</option>
+          <option value="unmatched">No conciliadas</option>
+        </select>
+      </label>
+      <label>Rango días: <input id="dayTolerance" type="number" value="3" min="0" max="30" style="width:60px"/></label>
+      <label>Tolerancia monto: <input id="amountTolerance" type="number" value="0.01" step="0.01" min="0" style="width:90px"/></label>
+    </section>
+
+    <section class="results">
+      <h2>Resultados</h2>
+      <div id="summary" class="summary"></div>
+      <div class="table-container">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Factura (Folio/UUID)</th>
+              <th>Fecha factura</th>
+              <th>Monto factura</th>
+              <th>Cliente / Descripción</th>
+              <th>Estado</th>
+              <th>Movimiento estado (ref)</th>
+              <th>Fecha movimiento</th>
+              <th>Monto movimiento</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="help">
+      <h3>Sugerencias</h3>
+      <ul>
+        <li>Para mejor precisión, acompaña tus PDFs con CSV cuando sea posible.</li>
+        <li>En XML CFDI se lee: <code>UUID</code>, <code>Serie</code>+<code>Folio</code>, <code>Fecha</code>, <code>Total</code>, <code>Receptor.Rfc</code>.</li>
+        <li>El PDF se interpreta con reglas heurísticas (puedes ajustar regex en <code>app.js</code>).</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <small>Conciliador AEMH SOFT • Soporta XML/PDF/CSV</small>
+  </footer>
+
+  <!-- PDF.js (CDN) -->
+  <script src="https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.min.js"></script>
+  <script>
+    // Config PDF.js worker
+    if (window['pdfjsLib']) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.js";
+    }
+  </script>
+  <script src="scrip/scrip.js"></script>
+</body>
+</html>
